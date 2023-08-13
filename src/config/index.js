@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
+export const COMPANY_ID = process.env.COMPANY_ID;
 export const PORT = process.env.PORT;
 export const PREFIX = process.env.PREFIX;
 export const MONGO_URI = process.env.MONGO_URI;
