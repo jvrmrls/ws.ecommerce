@@ -4,6 +4,7 @@ import Category from '#src/schemas/category';
 import Company from '#src/schemas/company';
 import Image from '#src/schemas/image';
 import Carousel from '#src/schemas/carousel';
+import Message from '#src/schemas/message';
 import { COMPANY_ID } from '#src/config/index';
 
 export const getData = async (req, res) => {
@@ -22,11 +23,14 @@ export const getData = async (req, res) => {
       company: COMPANY_ID,
       isActive: true
     });
-    const images = await Image.find({ company: COMPANY_ID });
+    const messages = await Message.find({
+      company: COMPANY_ID,
+      isActive: true
+    });
     const company = await Company.findOne({ _id: COMPANY_ID });
     return res
       .status(200)
-      .json(OK({ products, categories, carousels, images, company }));
+      .json(OK({ products, categories, carousels, messages, company }));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }

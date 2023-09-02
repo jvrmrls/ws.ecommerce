@@ -15,10 +15,13 @@ const CategorySchema = new Schema(
       type: Boolean,
       default: true
     },
+    order: {
+      type: Number,
+      default: Infinity
+    },
     company: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Company',
-      required: true
+      ref: 'Company'
     }
   },
   {
