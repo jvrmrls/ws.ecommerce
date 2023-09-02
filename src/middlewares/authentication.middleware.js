@@ -4,18 +4,19 @@ const uid = 'u7jFg1ExaVPH3zapa4HmlshCKCj2';
 
 export const authentication = async (req, res, next) => {
   try {
-    // const { authorization } = req.headers;
-    // if (!authorization) {
-    //   return res
-    //     .status(401)
-    //     .json(UNAUTHORIZED('Authorization header is required'));
-    // }
-    // const token = authorization.split(' ')[1];
-    // if (!token) {
-    //   return res.status(401).json(UNAUTHORIZED('Token is required'));
-    // }
-    // const { email, uid } = await admin.auth().verifyIdToken(token);
+    const { authorization } = req.headers;
+    if (!authorization) {
+      return res
+        .status(401)
+        .json(UNAUTHORIZED('Authorization header is required'));
+    }
+    const token = authorization.split(' ')[1];
+    if (!token) {
+      return res.status(401).json(UNAUTHORIZED('Token is required'));
+    }
+    const { email, uid } = await admin.auth().verifyIdToken(token);
     // req.user = { email, uid };
+    console.log(email, uid)
     req.user = { uid };
     return next();
   } catch (error) {

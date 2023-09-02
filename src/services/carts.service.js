@@ -1,4 +1,4 @@
-import { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR } from '#src/utils/response';
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR, OK } from '#src/utils/response';
 import { COMPANY_ID } from '#src/config/index';
 import Cart from '#src/schemas/cart';
 import CartDetail from '#src/schemas/cartDetail';
@@ -10,24 +10,16 @@ export const find = async (req, res) => {
     const carts = await Cart.find({
       uid: req.user.uid,
       company: COMPANY_ID
-    }).populate({
-      path: 'products',
-      populate: {
-        path: 'product',
+    })
+      .select('-createdAt -updatedAt -company -uid')
+      .populate({
+        path: 'products',
+        select: '-createdAt -updatedAt -cart -_id',
         populate: {
           path: 'options',
-          populate: {
-            path: 'options',
-            populate: {
-              path: 'option'
-            }
-          }
+          select: '-createdAt -updatedAt -cartDetail -_id'
         }
-      },
-      populate: {
-        path: 'options'
-      }
-    });
+      });
     return res.status(200).json(OK(carts));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
@@ -40,21 +32,15 @@ export const findByCode = async (req, res) => {
     const cart = await Cart.findOne({
       code,
       company: COMPANY_ID
-    }).populate({
-      path: 'products',
-      populate: {
-        path: 'product',
+    }).select('-createdAt -updatedAt -company -uid')
+      .populate({
+        path: 'products',
+        select: '-createdAt -updatedAt -cart -_id',
         populate: {
           path: 'options',
-          populate: {
-            path: 'options',
-            populate: {
-              path: 'option'
-            }
-          }
+          select: '-createdAt -updatedAt -cartDetail -_id'
         }
-      }
-    });
+      });
     if (!cart) {
       return res.status(400).json(BAD_REQUEST('Cart not found'));
     }
@@ -81,11 +67,10 @@ export const create = async (req, res) => {
     });
     // Save cart details
     for (const product of products) {
-      console.log(product);
       // Save an empty cart detail
       const cartDetail = await CartDetail.create({
         cart: cart?._id,
-        product: product?._id,
+        product: product?.product,
         quantity: product?.quantity,
         order: product?.order,
         options: []
@@ -94,7 +79,7 @@ export const create = async (req, res) => {
       for (const option of product?.options) {
         const cartDetailOption = await CartDetailOption.create({
           cartDetail: cartDetail?._id,
-          option: option?._id,
+          option: option?.option,
           selected: option?.selected
         });
         cartDetail?.options?.push(cartDetailOption?._id);
@@ -150,6 +135,47 @@ export const clone = async (req, res) => {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }
 };
+
+export const update = async (req, res) => {
+  try{
+    const { id } = req.params;
+    const { visibility, products } = req.body;
+    const cartDb = await Cart.findById(id);
+    if (!cartDb) { return res.status(400).json(BAD_REQUEST('Cart not found')); }
+    cartDb.visibility = visibility;
+    cartDb.save();
+    // Delete all the cart details
+    await CartDetail.deleteMany({ cart: id });
+    // Save cart details
+    for (const product of products) {
+      console.log(product)
+      // Save an empty cart detail
+      const cartDetail = await CartDetail.create({
+        cart: cartDb?._id,
+        product: product?.product,
+        quantity: product?.quantity,
+        order: product?.order,
+        options: []
+      });
+      // Save cart detail options
+      for (const option of product?.options) {
+        const cartDetailOption = await CartDetailOption.create({
+          cartDetail: cartDetail?._id,
+          option: option?.option,
+          selected: option?.selected
+        });
+        cartDetail?.options?.push(cartDetailOption?._id);
+      }
+      cartDetail.save();
+    }
+
+    const updatedCart = await Cart.findById(id)
+    return res.status(200).json(OK(updatedCart));
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
+  }
+}
 
 export const remove = async (req, res) => {
   try {

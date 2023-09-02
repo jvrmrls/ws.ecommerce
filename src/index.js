@@ -5,6 +5,7 @@ import conn from '#src/database/index';
 import '#src/config/firebase';
 import DataController from '#src/controllers/data.controller';
 import CartsController from '#src/controllers/carts.controller';
+import ImagesController from '#src/controllers/images.controller';
 
 /**
  * App instance
@@ -32,6 +33,7 @@ app.set('port', process.env.PORT || 3000);
  */
 app.use(`/${process.env.PREFIX}/data`, DataController);
 app.use(`/${process.env.PREFIX}/carts`, CartsController);
+app.use(`/${process.env.PREFIX}/images`, ImagesController);
 
 /**
  * Start the app listening on the port specified in the .env file

@@ -3,7 +3,8 @@ import { getData } from '#src/services/data.service';
 
 const router = Router();
 
-// GET /data
+// GET /data.http
 router.get('/', getData);
+
 
 export default router;

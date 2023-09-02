@@ -5,6 +5,7 @@ import {
   findByCode,
   create,
   clone,
+  update,
   remove,
   removeAll
 } from '#src/services/carts.service';
@@ -22,6 +23,9 @@ router.post('/', authentication, create);
 
 // POST /carts/clone/:code
 router.post('/clone/:code', authentication, clone);
+
+// PUT /carts/:id
+router.put('/:id', authentication, update);
 
 // DELETE /carts/all
 router.delete('/all', authentication, removeAll);
