@@ -3,9 +3,11 @@ import cors from 'cors';
 import '#src/config/index';
 import conn from '#src/database/index';
 import '#src/config/firebase';
+import TestsController from '#src/controllers/tests.controller';
 import DataController from '#src/controllers/data.controller';
 import CartsController from '#src/controllers/carts.controller';
 import ImagesController from '#src/controllers/images.controller';
+import OrdersController from '#src/controllers/orders.controller';
 
 /**
  * App instance
@@ -31,9 +33,11 @@ app.set('port', process.env.PORT || 3000);
 /**
  * Set the routes
  */
+app.use(`/${process.env.PREFIX}/tests`, TestsController);
 app.use(`/${process.env.PREFIX}/data`, DataController);
 app.use(`/${process.env.PREFIX}/carts`, CartsController);
 app.use(`/${process.env.PREFIX}/images`, ImagesController);
+app.use(`/${process.env.PREFIX}/orders`, OrdersController);
 
 /**
  * Start the app listening on the port specified in the .env file
