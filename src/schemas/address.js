@@ -23,10 +23,6 @@ const AddressSchema = new Schema(
       type: String,
       required: true
     },
-    city: {
-      type: String,
-      required: true
-    },
     reference: {
       type: String,
       default: ''
@@ -37,8 +33,7 @@ const AddressSchema = new Schema(
     },
     company: {
       type: Schema.Types.ObjectId,
-      ref: 'Company',
-      required: true
+      ref: 'Company'
     }
   },
   {
