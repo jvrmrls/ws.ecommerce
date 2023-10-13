@@ -39,7 +39,7 @@ app.use(`/${process.env.PREFIX}/tests`, TestsController);
 app.use(`/${process.env.PREFIX}/data`, DataController);
 app.use(`/${process.env.PREFIX}/carts`, CartsController);
 app.use(`/${process.env.PREFIX}/images`, ImagesController);
-app.use(`/${process.env.PREFIX}/client/orders`, OrdersController);
+app.use(`/${process.env.PREFIX}/orders`, OrdersController);
 app.use(`/${process.env.PREFIX}/client/addresses`, AddressesController);
 
 /**
