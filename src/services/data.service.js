@@ -11,35 +11,35 @@ import admin from 'firebase-admin';
 export const getData = async (req, res) => {
   try {
     const menu = await Product.find({ company: COMPANY_ID, isActive: true })
-      .select('name description price category options order')
+      .select('name description price category options order urlName isNew')
       .sort({ order: 1 })
       .populate({
-      path: 'options',
-      select: 'label options',
-      populate: {
         path: 'options',
-        select: 'option aditionalPrice order',
-        options: { sort: { order: 1 } },
+        select: 'label options',
         populate: {
-          path: 'option',
-          select: 'name',
+          path: 'options',
+          select: 'option aditionalPrice order',
+          options: { sort: { order: 1 } },
+          populate: {
+            path: 'option',
+            select: 'name'
+          }
         }
-      }
-    });
-    const categories = await Category.find({ company: COMPANY_ID, isActive: true })
+      });
+    const categories = await Category.find({
+      company: COMPANY_ID,
+      isActive: true
+    })
       .select('name description order')
-      .sort({ order: 1 })
-    ;
+      .sort({ order: 1 });
     const carousels = await Carousel.find({
       company: COMPANY_ID,
       isActive: true
-    })
-      .select('redirection reference order')
+    }).select('redirection reference order');
     const messages = await Message.find({
       company: COMPANY_ID,
       isActive: true
-    })
-      .select(' text startHour endHour days')
+    }).select(' text startHour endHour days');
     const company = await Company.findOne({ _id: COMPANY_ID });
     return res
       .status(200)
@@ -53,28 +53,25 @@ export const getData = async (req, res) => {
 export const getDataUser = async (req, res) => {
   try {
     const { user } = req;
-    const {
-      uid,
-      email,
-      displayName,
-      photoURL,
-      providerData
-    } = await admin.auth().getUser(user);
+    const { uid, email, displayName, photoURL, providerData } = await admin
+      .auth()
+      .getUser(user);
 
-    const providers = providerData?.reduce((acc,provider)=>{
-      acc.push(provider.providerId)
+    const providers = providerData?.reduce((acc, provider) => {
+      acc.push(provider.providerId);
       return acc;
-    }, [])
+    }, []);
 
     const response = {
-      uid, email,
+      uid,
+      email,
       name: displayName,
       profilePicture: photoURL,
       providers
-    }
+    };
     return res.status(200).json(OK(response));
   } catch (error) {
     console.log(error);
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }
-}
+};

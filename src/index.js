@@ -8,6 +8,7 @@ import DataController from '#src/controllers/data.controller';
 import CartsController from '#src/controllers/carts.controller';
 import ImagesController from '#src/controllers/images.controller';
 import OrdersController from '#src/controllers/orders.controller';
+import AddressesController from '#src/controllers/addresses.controller';
 
 /**
  * App instance
@@ -28,6 +29,7 @@ conn;
 /**
  * Set the app variables
  */
+console.log(process.env.PORT);
 app.set('port', process.env.PORT || 3000);
 
 /**
@@ -37,7 +39,8 @@ app.use(`/${process.env.PREFIX}/tests`, TestsController);
 app.use(`/${process.env.PREFIX}/data`, DataController);
 app.use(`/${process.env.PREFIX}/carts`, CartsController);
 app.use(`/${process.env.PREFIX}/images`, ImagesController);
-app.use(`/${process.env.PREFIX}/orders`, OrdersController);
+app.use(`/${process.env.PREFIX}/client/orders`, OrdersController);
+app.use(`/${process.env.PREFIX}/client/addresses`, AddressesController);
 
 /**
  * Start the app listening on the port specified in the .env file

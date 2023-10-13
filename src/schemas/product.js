@@ -24,6 +24,14 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: true
     },
+    isNew: {
+      type: Boolean,
+      default: false
+    },
+    urlName: {
+      type: String,
+      default: ''
+    },
     category: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
