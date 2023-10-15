@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
+    "build": "node --version",
     "dev": "nodemon src/index.js"
   },
   "keywords": [],
