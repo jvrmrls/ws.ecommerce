@@ -10,6 +10,7 @@ import ImagesController from '#src/controllers/images.controller';
 import OrdersController from '#src/controllers/orders.controller';
 import AddressesController from '#src/controllers/addresses.controller';
 import PreferencesController from '#src/controllers/preferences.controller';
+import FavoriteProductsController from '#src/controllers/favoriteProducts.controller';
 
 /**
  * App instance
@@ -43,6 +44,10 @@ app.use(`/${process.env.PREFIX}/images`, ImagesController);
 app.use(`/${process.env.PREFIX}/orders`, OrdersController);
 app.use(`/${process.env.PREFIX}/client/addresses`, AddressesController);
 app.use(`/${process.env.PREFIX}/client/preferences`, PreferencesController);
+app.use(
+  `/${process.env.PREFIX}/client/favorite-products`,
+  FavoriteProductsController
+);
 
 /**
  * Start the app listening on the port specified in the .env file
