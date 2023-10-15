@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 
 dotenv.config();
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+// dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 export const COMPANY_ID = process.env.COMPANY_ID;
 export const PORT = process.env.PORT;
