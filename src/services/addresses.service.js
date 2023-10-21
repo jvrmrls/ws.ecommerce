@@ -18,7 +18,7 @@ export const find = async (req, res) => {
 
 export const create = async (req, res) => {
   try {
-    const { name, longitute, latitude, street, zone, reference } = req.body;
+    const { name, longitute, latitude } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json(BAD_REQUEST(errors.array()));
@@ -27,9 +27,6 @@ export const create = async (req, res) => {
       name,
       longitute,
       latitude,
-      street,
-      zone,
-      reference,
       uid: req.uid
     });
     return res.status(201).json(OK(address));
@@ -41,7 +38,7 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, longitute, latitude, street, zone, reference } = req.body;
+    const { name, longitute, latitude } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json(BAD_REQUEST(errors.array()));
@@ -51,10 +48,7 @@ export const update = async (req, res) => {
       {
         name,
         longitute,
-        latitude,
-        street,
-        zone,
-        reference
+        latitude
       },
       { new: true }
     );

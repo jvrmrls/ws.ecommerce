@@ -15,14 +15,6 @@ const AddressSchema = new Schema(
       type: Number,
       required: true
     },
-    street: {
-      type: String,
-      required: true
-    },
-    zone: {
-      type: String,
-      required: true
-    },
     reference: {
       type: String,
       default: ''
