@@ -7,7 +7,7 @@ const AddressSchema = new Schema(
       type: String,
       required: true
     },
-    longitute: {
+    longitude: {
       type: Number,
       required: true
     },
