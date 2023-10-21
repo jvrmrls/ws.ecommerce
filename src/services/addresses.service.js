@@ -18,14 +18,14 @@ export const find = async (req, res) => {
 
 export const create = async (req, res) => {
   try {
-    const { name, longitute, latitude } = req.body;
+    const { name, longitude, latitude } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json(BAD_REQUEST(errors.array()));
     }
     const address = await Address.create({
       name,
-      longitute,
+      longitude,
       latitude,
       uid: req.uid
     });
