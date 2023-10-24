@@ -15,6 +15,14 @@ const AddressSchema = new Schema(
       type: Number,
       required: true
     },
+    street: {
+      type: String,
+      required: true
+    },
+    houseNumber: {
+      type: String,
+      required: true
+    },
     reference: {
       type: String,
       default: ''

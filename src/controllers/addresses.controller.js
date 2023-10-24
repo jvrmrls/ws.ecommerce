@@ -26,6 +26,11 @@ router.put(
   body('name').trim().notEmpty().withMessage('El nombre es requerido'),
   body('longitude').trim().notEmpty().withMessage('La longitud es requerida'),
   body('latitude').trim().notEmpty().withMessage('La latitud es requerida'),
+  body('street').trim().notEmpty().withMessage('La calle es requerida'),
+  body('houseNumber')
+    .trim()
+    .notEmpty()
+    .withMessage('El número de casa / piso es requerido'),
   update
 );
 
