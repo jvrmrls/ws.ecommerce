@@ -27,6 +27,10 @@ const AddressSchema = new Schema(
       type: String,
       default: ''
     },
+    isPrimary: {
+      type: Boolean,
+      default: false
+    },
     uid: {
       type: String,
       required: true
