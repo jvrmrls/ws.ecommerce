@@ -11,6 +11,10 @@ const OptionSchema = new Schema(
       type: String,
       default: ''
     },
+    shortName: {
+      type: String,
+      required: true
+    },
     isActive: {
       type: Boolean,
       default: true
