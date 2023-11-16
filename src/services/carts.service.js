@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const find = async (req, res) => {
   try {
     const carts = await Cart.find({
-      uid: req.user.uid,
+      uid: req?.uid,
       company: COMPANY_ID
     })
       .select('-createdAt -updatedAt -company -uid')
@@ -32,7 +32,8 @@ export const findByCode = async (req, res) => {
     const cart = await Cart.findOne({
       code,
       company: COMPANY_ID
-    }).select('-createdAt -updatedAt -company -uid')
+    })
+      .select('-createdAt -updatedAt -company -uid')
       .populate({
         path: 'products',
         select: '-createdAt -updatedAt -cart -_id',
@@ -62,7 +63,7 @@ export const create = async (req, res) => {
       code: uuidv4(),
       status,
       visibility,
-      uid: req?.user?.uid || null,
+      uid: req?.uid || null,
       products: []
     });
     // Save cart details
@@ -105,7 +106,7 @@ export const clone = async (req, res) => {
       code: uuidv4(),
       status: cart?.status,
       visibility: cart?.visibility,
-      uid: req?.user?.uid || null,
+      uid: req?.uid || null,
       products: []
     });
     for (const product of cart?.products) {
@@ -137,18 +138,20 @@ export const clone = async (req, res) => {
 };
 
 export const update = async (req, res) => {
-  try{
+  try {
     const { id } = req.params;
     const { visibility, products } = req.body;
     const cartDb = await Cart.findById(id);
-    if (!cartDb) { return res.status(400).json(BAD_REQUEST('Cart not found')); }
+    if (!cartDb) {
+      return res.status(400).json(BAD_REQUEST('Cart not found'));
+    }
     cartDb.visibility = visibility;
     cartDb.save();
     // Delete all the cart details
     await CartDetail.deleteMany({ cart: id });
     // Save cart details
     for (const product of products) {
-      console.log(product)
+      console.log(product);
       // Save an empty cart detail
       const cartDetail = await CartDetail.create({
         cart: cartDb?._id,
@@ -169,13 +172,13 @@ export const update = async (req, res) => {
       cartDetail.save();
     }
 
-    const updatedCart = await Cart.findById(id)
+    const updatedCart = await Cart.findById(id);
     return res.status(200).json(OK(updatedCart));
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }
-}
+};
 
 export const remove = async (req, res) => {
   try {
@@ -194,7 +197,7 @@ export const remove = async (req, res) => {
 export const removeAll = async (req, res) => {
   try {
     const carts = await Cart.find({
-      uid: req.user.uid,
+      uid: req?.uid,
       company: COMPANY_ID
     });
     for (const cart of carts) {
