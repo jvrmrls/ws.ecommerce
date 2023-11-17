@@ -11,7 +11,7 @@ const OptionSchema = new Schema(
       type: String,
       default: ''
     },
-    shortName: {
+    code: {
       type: String,
       required: true
     },
