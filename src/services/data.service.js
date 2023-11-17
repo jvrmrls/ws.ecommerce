@@ -11,7 +11,9 @@ import admin from 'firebase-admin';
 export const getData = async (req, res) => {
   try {
     const menu = await Product.find({ company: COMPANY_ID, isActive: true })
-      .select('name description price category options order urlName isNew')
+      .select(
+        'name description price category options order urlName isNew tags'
+      )
       .sort({ order: 1 })
       .populate({
         path: 'options',
