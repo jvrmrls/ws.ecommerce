@@ -37,7 +37,7 @@ export const remove = async (req, res) => {
   try {
     const { id } = req?.params;
     const favoriteProduct = await FavoriteProduct.findOneAndDelete({
-      _id: id,
+      product: id,
       uid: req?.uid
     });
     if (!favoriteProduct) {
