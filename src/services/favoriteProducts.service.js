@@ -9,7 +9,13 @@ export const find = async (req, res) => {
     const favoriteProducts = await FavoriteProduct.find({
       uid: req?.uid,
       company: COMPANY_ID
-    }).select('-createdAt -updatedAt -company -uid');
+    })
+      .select('-createdAt -updatedAt -company -uid')
+      .populate({
+        path: 'product',
+        select: 'name'
+      });
+
     return res.status(200).json(OK(favoriteProducts));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
