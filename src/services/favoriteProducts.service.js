@@ -24,6 +24,13 @@ export const create = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json(BAD_REQUEST(errors.array()));
     }
+    const alreadyFavorite = await FavoriteProduct.findOne({
+      product,
+      uid: req?.uid
+    });
+    if (alreadyFavorite) {
+      return res.status(201).json(OK(alreadyFavorite));
+    }
     const favoriteProduct = await FavoriteProduct.create({
       product,
       uid: req?.uid
