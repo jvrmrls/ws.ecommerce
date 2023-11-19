@@ -24,7 +24,7 @@ export const getData = async (req, res) => {
           options: { sort: { order: 1 } },
           populate: {
             path: 'option',
-            select: 'name code'
+            select: 'name cartName'
           }
         }
       });

@@ -11,7 +11,7 @@ const OptionSchema = new Schema(
       type: String,
       default: ''
     },
-    code: {
+    cartName: {
       type: String,
       required: true
     },
