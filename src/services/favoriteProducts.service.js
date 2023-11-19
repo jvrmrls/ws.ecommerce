@@ -29,7 +29,7 @@ export const create = async (req, res) => {
       uid: req?.uid
     });
     if (alreadyFavorite) {
-      return res.status(201).json(OK(alreadyFavorite));
+      return res.status(400).json(BAD_REQUEST('Product already favorite'));
     }
     const favoriteProduct = await FavoriteProduct.create({
       product,
