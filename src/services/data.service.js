@@ -46,7 +46,9 @@ export const getData = async (req, res) => {
     const options = await Option.find({
       company: COMPANY_ID,
       isActive: true
-    }).select('name cartName');
+    })
+      .sort({ name: 1 })
+      .select('name cartName');
     return res
       .status(200)
       .json(OK({ menu, categories, options, carousels, messages, company }));
