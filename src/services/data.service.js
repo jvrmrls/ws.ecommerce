@@ -43,9 +43,13 @@ export const getData = async (req, res) => {
       isActive: true
     }).select(' text startHour endHour days');
     const company = await Company.findOne({ _id: COMPANY_ID });
+    const options = await Option.find({
+      company: COMPANY_ID,
+      isActive: true
+    }).select('name cartName');
     return res
       .status(200)
-      .json(OK({ menu, categories, carousels, messages, company }));
+      .json(OK({ menu, categories, options, carousels, messages, company }));
   } catch (error) {
     console.log(error);
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
