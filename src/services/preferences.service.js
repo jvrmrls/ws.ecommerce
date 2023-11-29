@@ -30,6 +30,11 @@ export const create = async (req, res) => {
       company: COMPANY_ID
     });
     if (preferenceExists) {
+      // Verify if preference already has the value
+      const valueExists = preferenceExists.value.find((val) => val === value);
+      if (valueExists) {
+        return res.status(200).json(OK(preferenceExists));
+      }
       // Add to the array of values, the new value
       preferenceExists.value.push(value);
       await preferenceExists.save();
@@ -70,26 +75,28 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { value } = req.body;
-    // Verify if value is not empty, means that the user wants to remove a value from the array
-    if (value) {
-      const preference = await Preference.findOneAndUpdate(
-        { _id: id, uid: req.uid, company: COMPANY_ID },
-        {
-          $pull: { value }
-        },
-        { new: true }
-      );
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json(BAD_REQUEST(errors.array()));
+    }
+    const { id, value } = req.params;
+    const preference = await Preference.findOneAndUpdate(
+      { _id: id, uid: req.uid, company: COMPANY_ID },
+      {
+        $pull: { value }
+      },
+      { new: true }
+    );
+    if (preference?.value?.length === 0) {
+      await Preference.findOneAndDelete({
+        _id: id,
+        uid: req.uid,
+        company: COMPANY_ID
+      });
       return res.status(200).json(OK(preference));
     }
-    // If value is empty, means that the user wants to remove the preference
-    await Preference.findOneAndDelete({
-      _id: id,
-      uid: req.uid,
-      company: COMPANY_ID
-    });
-    return res.status(200).json(OK());
+    console.log(preference);
+    return res.status(200).json(OK(preference));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }
