@@ -95,7 +95,6 @@ export const remove = async (req, res) => {
       });
       return res.status(200).json(OK(preference));
     }
-    console.log(preference);
     return res.status(200).json(OK(preference));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
