@@ -15,6 +15,10 @@ const OptionSchema = new Schema(
       type: String,
       required: true
     },
+    group: {
+      type: String,
+      default: ''
+    },
     isActive: {
       type: Boolean,
       default: true
@@ -33,6 +37,9 @@ const OptionSchema = new Schema(
 
 OptionSchema.pre('save', function (next) {
   this.company = COMPANY_ID;
+  if (this.group !== '') {
+    this.group = this?.group?.toUpperCase();
+  }
   next();
 });
 
