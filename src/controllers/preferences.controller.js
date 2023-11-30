@@ -11,7 +11,12 @@ import { body, param, validationResult } from 'express-validator';
 const router = Router();
 
 // GET /preferences
-router.get('/', authentication, find);
+router.get(
+  '/:code',
+  authentication,
+  param('code').isIn(['OPT']).withMessage('El código es inválido'),
+  find
+);
 
 // POST /preferences
 router.post('/', authentication, create);

@@ -6,7 +6,9 @@ import { validationResult } from 'express-validator';
 
 export const find = async (req, res) => {
   try {
-    const preferences = await Preference.find({
+    const { code } = req.params;
+    const preferences = await Preference.findOne({
+      code: code?.toUpperCase(),
       uid: req.uid,
       company: COMPANY_ID
     }).select('-createdAt -updatedAt -company -uid');
