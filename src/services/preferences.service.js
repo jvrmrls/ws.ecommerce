@@ -6,98 +6,41 @@ import { validationResult } from 'express-validator';
 
 export const find = async (req, res) => {
   try {
-    const { code } = req.params;
     const preferences = await Preference.findOne({
-      code: code?.toUpperCase(),
       uid: req.uid,
       company: COMPANY_ID
     }).select('-createdAt -updatedAt -company -uid');
-    return res.status(200).json(OK(preferences));
-  } catch (error) {
-    return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
-  }
-};
-
-export const create = async (req, res) => {
-  try {
-    const { code, value } = req.body;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(BAD_REQUEST(errors.array()));
-    }
-    //* Verify if the preference already exists
-    const preferenceExists = await Preference.findOne({
-      code,
+    if (preferences) return res.status(200).json(OK(preferences));
+    // If the user doesn't have preferences, create them
+    const newPreferences = await Preference.create({
       uid: req.uid,
+      values: [],
       company: COMPANY_ID
     });
-    if (preferenceExists) {
-      // Verify if preference already has the value
-      const valueExists = preferenceExists.value.find((val) => val === value);
-      if (valueExists) {
-        return res.status(200).json(OK(preferenceExists));
-      }
-      // Add to the array of values, the new value
-      preferenceExists.value.push(value);
-      await preferenceExists.save();
-      return res.status(201).json(OK(preferenceExists));
-    }
-    const preference = await Preference.create({
-      code,
-      value: [value],
-      uid: req.uid
-    });
-    return res.status(201).json(OK(preference));
+    return res.status(200).json(OK(newPreferences));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }
 };
 
-export const update = async (req, res) => {
+export const addOrRemove = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { code, value } = req.body;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(BAD_REQUEST(errors.array()));
-    }
-    const preference = await Preference.findOneAndUpdate(
-      { _id: id, uid: req.uid, company: COMPANY_ID },
-      {
-        code,
-        value
-      },
-      { new: true }
-    );
-    return res.status(200).json(OK(preference));
-  } catch (error) {
-    return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
-  }
-};
+    const { action } = req?.params;
+    const { value } = req.body;
 
-export const remove = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(BAD_REQUEST(errors.array()));
+    if (action !== 'add' && action !== 'remove') {
+      return res.status(400).json(BAD_REQUEST('Invalid action'));
     }
-    const { id, value } = req.params;
-    const preference = await Preference.findOneAndUpdate(
-      { _id: id, uid: req.uid, company: COMPANY_ID },
+
+    //* Update or create preferences
+    const preferences = await Preference.findOneAndUpdate(
+      { uid: req.uid, company: COMPANY_ID },
       {
-        $pull: { value }
+        [action === 'add' ? '$addToSet' : '$pull']: { values: value }
       },
       { new: true }
     );
-    if (preference?.value?.length === 0) {
-      await Preference.findOneAndDelete({
-        _id: id,
-        uid: req.uid,
-        company: COMPANY_ID
-      });
-      return res.status(200).json(OK(preference));
-    }
-    return res.status(200).json(OK(preference));
+    return res.status(200).json(OK(preferences));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }

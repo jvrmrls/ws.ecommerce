@@ -3,20 +3,18 @@ import { COMPANY_ID } from '#src/config/index';
 
 const PreferenceSchema = new Schema(
   {
-    code: {
-      type: String,
-      required: true
-    },
-    value: [
-      {
-        type: Schema.Types.Mixed,
-        required: true
-      }
-    ],
     uid: {
       type: String,
       required: true
     },
+    values: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Option',
+        required: true,
+        unique: true
+      }
+    ],
     company: {
       type: Schema.Types.ObjectId,
       ref: 'Company'
