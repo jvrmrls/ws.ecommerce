@@ -24,7 +24,7 @@ export const getData = async (req, res) => {
           options: { sort: { order: 1 } },
           populate: {
             path: 'option',
-            select: 'name cartName group'
+            select: 'name cartName'
           }
         }
       });
@@ -48,7 +48,7 @@ export const getData = async (req, res) => {
       isActive: true
     })
       .sort({ name: 1 })
-      .select('name cartName');
+      .select('name cartName group');
     return res
       .status(200)
       .json(OK({ menu, categories, options, carousels, messages, company }));
