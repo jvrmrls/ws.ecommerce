@@ -31,6 +31,26 @@ export const addOrRemove = async (req, res) => {
     if (action !== 'add' && action !== 'remove') {
       return res.status(400).json(BAD_REQUEST('Invalid action'));
     }
+    //* If the action is add, validate the value is not present in the preferences
+    if (action === 'add') {
+      const preferences = await Preference.findOne({
+        uid: req.uid,
+        company: COMPANY_ID
+      });
+      if (preferences?.values?.includes(value)) {
+        return res.status(200).json(OK(preferences));
+      }
+    }
+    //* If the action is remove, validate the value is present in the preferences
+    if (action === 'remove') {
+      const preferences = await Preference.findOne({
+        uid: req.uid,
+        company: COMPANY_ID
+      });
+      if (!preferences?.values?.includes(value)) {
+        return res.status(200).json(OK(preferences));
+      }
+    }
 
     //* Update or create preferences
     const preferences = await Preference.findOneAndUpdate(

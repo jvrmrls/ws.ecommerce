@@ -11,8 +11,7 @@ const PreferenceSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: 'Option',
-        required: true,
-        unique: true
+        required: true
       }
     ],
     company: {
