@@ -9,6 +9,7 @@ import {
   remove,
   removeAll
 } from '#src/services/carts.service';
+import { body, param, validationResult } from 'express-validator';
 
 const router = Router();
 
@@ -19,7 +20,12 @@ router.get('/', authentication, find);
 router.get('/code/:code', authentication, findByCode);
 
 // POST /carts
-router.post('/', authentication, create);
+router.post(
+  '/',
+  body('menu').isArray().withMessage('El menú debe ser una lista'),
+  authentication,
+  create
+);
 
 // POST /carts/clone/:code
 router.post('/clone/:code', authentication, clone);

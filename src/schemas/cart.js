@@ -22,7 +22,7 @@ const CartSchema = new Schema(
       type: String,
       default: null
     },
-    products: [
+    menu: [
       {
         type: Schema.Types.ObjectId,
         ref: 'CartDetail'
@@ -48,7 +48,7 @@ CartSchema.pre(
   'deleteOne',
   { document: true, query: false },
   async function (next) {
-    for (const product of this.products) {
+    for (const product of this.menu) {
       const deletedProduct = await CartDetail.findById(product);
       await deletedProduct.deleteOne();
     }

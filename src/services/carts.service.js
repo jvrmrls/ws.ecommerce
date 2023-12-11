@@ -13,7 +13,7 @@ export const find = async (req, res) => {
     })
       .select('-createdAt -updatedAt -company -uid')
       .populate({
-        path: 'products',
+        path: 'menu',
         select: '-createdAt -updatedAt -cart -_id',
         populate: {
           path: 'options',
@@ -35,7 +35,7 @@ export const findByCode = async (req, res) => {
     })
       .select('-createdAt -updatedAt -company -uid')
       .populate({
-        path: 'products',
+        path: 'menu',
         select: '-createdAt -updatedAt -cart -_id',
         populate: {
           path: 'options',
@@ -57,17 +57,21 @@ export const create = async (req, res) => {
     //   user: req.user._id,
     //   company: COMPANY_ID
     // });
-    const { status, visibility, products } = req.body;
+    const { status, visibility, menu } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json(BAD_REQUEST(errors.array()));
+    }
     // Save an empty cart
     const cart = await Cart.create({
       code: uuidv4(),
       status,
       visibility,
       uid: req?.uid || null,
-      products: []
+      menu: []
     });
     // Save cart details
-    for (const product of products) {
+    for (const product of menu) {
       // Save an empty cart detail
       const cartDetail = await CartDetail.create({
         cart: cart?._id,
@@ -86,7 +90,7 @@ export const create = async (req, res) => {
         cartDetail?.options?.push(cartDetailOption?._id);
       }
       cartDetail.save();
-      cart?.products?.push(cartDetail?._id);
+      cart?.menu?.push(cartDetail?._id);
     }
     cart.save();
     return res.status(200).json(OK(cart));
@@ -107,9 +111,9 @@ export const clone = async (req, res) => {
       status: cart?.status,
       visibility: cart?.visibility,
       uid: req?.uid || null,
-      products: []
+      menu: []
     });
-    for (const product of cart?.products) {
+    for (const product of cart?.menu) {
       const clonedProduct = await CartDetail.findById(product);
       const clonedCartDetail = await CartDetail.create({
         cart: clonedCart?._id,
@@ -128,7 +132,7 @@ export const clone = async (req, res) => {
         clonedCartDetail?.options?.push(clonedCartDetailOption?._id);
       }
       clonedCartDetail.save();
-      clonedCart?.products?.push(clonedCartDetail?._id);
+      clonedCart?.menu?.push(clonedCartDetail?._id);
     }
     clonedCart.save();
     return res.status(200).json(OK(clonedCart));
@@ -140,7 +144,7 @@ export const clone = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { visibility, products } = req.body;
+    const { visibility, menu } = req.body;
     const cartDb = await Cart.findById(id);
     if (!cartDb) {
       return res.status(400).json(BAD_REQUEST('Cart not found'));
@@ -150,8 +154,7 @@ export const update = async (req, res) => {
     // Delete all the cart details
     await CartDetail.deleteMany({ cart: id });
     // Save cart details
-    for (const product of products) {
-      console.log(product);
+    for (const product of menu) {
       // Save an empty cart detail
       const cartDetail = await CartDetail.create({
         cart: cartDb?._id,
