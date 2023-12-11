@@ -4,6 +4,7 @@ import Cart from '#src/schemas/cart';
 import CartDetail from '#src/schemas/cartDetail';
 import CartDetailOption from '#src/schemas/cartDetailOption';
 import { v4 as uuidv4 } from 'uuid';
+import { validationResult } from 'express-validator';
 
 export const find = async (req, res) => {
   try {
