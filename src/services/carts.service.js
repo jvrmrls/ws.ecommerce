@@ -52,25 +52,35 @@ export const findByCode = async (req, res) => {
   }
 };
 
-export const create = async (req, res) => {
+export const save = async (req, res) => {
   try {
     // const cart = await Cart.create({
     //   user: req.user._id,
     //   company: COMPANY_ID
     // });
-    const { status, visibility, menu } = req.body;
+    const { _id, status, visibility, menu } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json(BAD_REQUEST(errors.array()));
     }
-    // Save an empty cart
-    const cart = await Cart.create({
-      code: uuidv4(),
-      status,
-      visibility,
-      uid: req?.uid || null,
-      menu: []
-    });
+    let cart = await Cart.findById(_id);
+    if (!cart) {
+      // Save an empty cart
+      cart = await Cart.create({
+        code: uuidv4(),
+        status,
+        visibility,
+        uid: req?.uid || null,
+        menu: []
+      });
+    } else {
+      cart.visibility = visibility;
+      cart.status = status;
+      cart.menu = [];
+      cart.save();
+      // Delete all the cart details
+      await CartDetail.deleteMany({ cart: cart?._id });
+    }
     // Save cart details
     for (const product of menu) {
       // Save an empty cart detail
@@ -138,55 +148,6 @@ export const clone = async (req, res) => {
     clonedCart.save();
     return res.status(200).json(OK(clonedCart));
   } catch (error) {
-    return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
-  }
-};
-
-export const update = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { visibility, menu } = req.body;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(BAD_REQUEST(errors.array()));
-    }
-    const cartDb = await Cart.findById(id);
-    if (!cartDb) {
-      return res.status(400).json(BAD_REQUEST('Cart not found'));
-    }
-    cartDb.visibility = visibility;
-    cartDb.menu = [];
-    cartDb.save();
-    // Delete all the cart details
-    await CartDetail.deleteMany({ cart: id });
-    // Save cart details
-    for (const product of menu) {
-      // Save an empty cart detail
-      const cartDetail = await CartDetail.create({
-        cart: cartDb?._id,
-        product: product?.product,
-        quantity: product?.quantity,
-        order: product?.order,
-        options: []
-      });
-      // Save cart detail options
-      for (const option of product?.options) {
-        const cartDetailOption = await CartDetailOption.create({
-          cartDetail: cartDetail?._id,
-          option: option?.option,
-          selected: option?.selected
-        });
-        cartDetail?.options?.push(cartDetailOption?._id);
-      }
-      cartDetail.save();
-      cartDb?.menu?.push(cartDetail?._id);
-    }
-    cartDb.save();
-
-    const updatedCart = await Cart.findById(id);
-    return res.status(200).json(OK(updatedCart));
-  } catch (error) {
-    console.log(error);
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }
 };

@@ -3,9 +3,8 @@ import { authentication } from '#src/middlewares/authentication.middleware';
 import {
   find,
   findByCode,
-  create,
+  save,
   clone,
-  update,
   remove,
   removeAll
 } from '#src/services/carts.service';
@@ -24,20 +23,11 @@ router.post(
   '/',
   body('menu').isArray({ min: 1 }).withMessage('El menú debe ser una lista'),
   authentication,
-  create
+  save
 );
 
 // POST /carts/clone/:code
 router.post('/clone/:code', authentication, clone);
-
-// PUT /carts/:id
-router.put(
-  '/:id',
-  param('id').isMongoId().withMessage('El id debe ser un mongoId'),
-  body('menu').isArray({ min: 1 }).withMessage('El menú debe ser una lista'),
-  authentication,
-  update
-);
 
 // DELETE /carts/all
 router.delete('/all', authentication, removeAll);
