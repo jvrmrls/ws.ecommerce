@@ -146,6 +146,10 @@ export const update = async (req, res) => {
   try {
     const { id } = req.params;
     const { visibility, menu } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json(BAD_REQUEST(errors.array()));
+    }
     const cartDb = await Cart.findById(id);
     if (!cartDb) {
       return res.status(400).json(BAD_REQUEST('Cart not found'));

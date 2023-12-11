@@ -31,7 +31,13 @@ router.post(
 router.post('/clone/:code', authentication, clone);
 
 // PUT /carts/:id
-router.put('/:id', authentication, update);
+router.put(
+  '/:id',
+  param('id').isMongoId().withMessage('El id debe ser un mongoId'),
+  body('menu').isArray({ min: 1 }).withMessage('El menú debe ser una lista'),
+  authentication,
+  update
+);
 
 // DELETE /carts/all
 router.delete('/all', authentication, removeAll);
