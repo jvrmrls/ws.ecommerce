@@ -22,6 +22,7 @@ router.get('/code/:code', authentication, findByCode);
 // POST /carts
 router.post(
   '/',
+  body('menu').notEmpty().withMessage('El menú no puede estar vacío'),
   body('menu').isArray().withMessage('El menú debe ser una lista'),
   authentication,
   create
