@@ -155,6 +155,7 @@ export const update = async (req, res) => {
       return res.status(400).json(BAD_REQUEST('Cart not found'));
     }
     cartDb.visibility = visibility;
+    cartDb.menu = [];
     cartDb.save();
     // Delete all the cart details
     await CartDetail.deleteMany({ cart: id });
@@ -178,7 +179,9 @@ export const update = async (req, res) => {
         cartDetail?.options?.push(cartDetailOption?._id);
       }
       cartDetail.save();
+      cartDb?.menu?.push(cartDetail?._id);
     }
+    cartDb.save();
 
     const updatedCart = await Cart.findById(id);
     return res.status(200).json(OK(updatedCart));
