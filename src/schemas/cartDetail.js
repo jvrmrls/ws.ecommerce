@@ -9,7 +9,7 @@ const CartDetailSchema = new Schema(
     },
     product: {
       type: Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: 'Product'
     },
     quantity: {
       type: Number,
@@ -39,6 +39,22 @@ CartDetailSchema.pre(
     for (const option of this.options) {
       const deletedCartDetailOption = await CartDetailOption.findById(option);
       await deletedCartDetailOption.deleteOne();
+    }
+    next();
+  }
+);
+
+CartDetailSchema.pre(
+  'deleteMany',
+  { document: false, query: true },
+  async function (next) {
+    const cartDetails = await this.model.find(this.getFilter());
+    for (const cartDetail of cartDetails) {
+      for (const option of cartDetail.options) {
+        console.log(option);
+        const deletedCartDetailOption = await CartDetailOption.findById(option);
+        await deletedCartDetailOption.deleteOne();
+      }
     }
     next();
   }

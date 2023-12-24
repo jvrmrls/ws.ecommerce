@@ -68,6 +68,11 @@ export const save = async (req, res) => {
       return res.status(400).json(BAD_REQUEST(errors.array()));
     }
     let cart = await Cart.findById(_id);
+    // Remove the cart if the menu is empty and cart exists
+    if (menu?.length === 0 && !!cart) {
+      await cart.deleteOne();
+      return res.status(200).json(OK(null));
+    }
     if (!cart) {
       // Save an empty cart
       cart = await Cart.create({
@@ -87,18 +92,8 @@ export const save = async (req, res) => {
     }
     // Save cart details
     for (const product of menu) {
-      // Validate every product
-      // Validate if the product exists
-      const productExists = await Product.findById(product?.product);
-      if (!productExists) {
-        return res.status(400).json(BAD_REQUEST('Product not found'));
-      }
-      // Validate if the product is available
-      if (!productExists?.isActive) {
-        return res.status(400).json(BAD_REQUEST('Product not available'));
-      }
-      // Validate if the options exists and are available
-      const productIsValid = await validateProduct(productExists, product);
+      // Validate the product and the options
+      const productIsValid = await validateProduct(product);
       if (!productIsValid) {
         // Continue with the next product
         continue;
@@ -210,7 +205,16 @@ export const removeAll = async (req, res) => {
   }
 };
 
-const validateProduct = async (productInDb, productToValidate) => {
+const validateProduct = async (productToValidate) => {
+  // Validate if the product exists
+  const productInDb = await Product.findById(productToValidate?.product);
+  if (!productInDb) {
+    return res.status(400).json(BAD_REQUEST('Product not found'));
+  }
+  // Validate if the product is available
+  if (!productInDb?.isActive) {
+    return res.status(400).json(BAD_REQUEST('Product not available'));
+  }
   for (const optionInProduct of productInDb?.options) {
     // console.log(optionInProduct);
     // Verify if the option group exists
