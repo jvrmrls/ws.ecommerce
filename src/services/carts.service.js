@@ -166,7 +166,7 @@ export const clone = async (req, res) => {
         });
         clonedCartDetail?.options?.push(clonedCartDetailOption?._id);
       }
-      clonedCartDetail.save();
+      await clonedCartDetail.save();
       clonedCart?.menu?.push(clonedCartDetail?._id);
     }
     await clonedCart.save();
