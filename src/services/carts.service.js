@@ -104,7 +104,14 @@ export const save = async (req, res) => {
       cart?.menu?.push(cartDetail?._id);
     }
     cart.save();
-    const populatedCart = await Cart.findById(cart?._id);
+    const populatedCart = await Cart.findById(cart?._id)?.populate({
+      path: 'menu',
+      select: '-createdAt -updatedAt -cart -_id',
+      populate: {
+        path: 'options',
+        select: '-createdAt -updatedAt -cartDetail -_id'
+      }
+    });
     return res.status(200).json(OK(populatedCart));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
