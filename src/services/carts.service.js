@@ -169,8 +169,16 @@ export const clone = async (req, res) => {
       clonedCartDetail.save();
       clonedCart?.menu?.push(clonedCartDetail?._id);
     }
-    clonedCart.save();
-    return res.status(200).json(OK(clonedCart));
+    await clonedCart.save();
+    const populatedCart = await Cart.findById(clonedCart?._id)?.populate({
+      path: 'menu',
+      select: '-createdAt -updatedAt -cart -_id',
+      populate: {
+        path: 'options',
+        select: '-createdAt -updatedAt -cartDetail -_id'
+      }
+    });
+    return res.status(200).json(OK(populatedCart));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
   }
