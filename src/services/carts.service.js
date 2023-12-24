@@ -3,6 +3,10 @@ import { COMPANY_ID } from '#src/config/index';
 import Cart from '#src/schemas/cart';
 import CartDetail from '#src/schemas/cartDetail';
 import CartDetailOption from '#src/schemas/cartDetailOption';
+import Product from '#src/schemas/product';
+import ProductOptionGroup from '#src/schemas/productOptionGroup';
+import ProductOption from '#src/schemas/productOption';
+import Option from '#src/schemas/option';
 import { v4 as uuidv4 } from 'uuid';
 import { validationResult } from 'express-validator';
 
@@ -83,6 +87,23 @@ export const save = async (req, res) => {
     }
     // Save cart details
     for (const product of menu) {
+      // Validate every product
+      // Validate if the product exists
+      const productExists = await Product.findById(product?.product);
+      if (!productExists) {
+        return res.status(400).json(BAD_REQUEST('Product not found'));
+      }
+      // Validate if the product is available
+      if (!productExists?.isActive) {
+        return res.status(400).json(BAD_REQUEST('Product not available'));
+      }
+      // Validate if the options exists and are available
+      const productIsValid = await validateProduct(productExists, product);
+      if (!productIsValid) {
+        // Continue with the next product
+        continue;
+      }
+
       // Save an empty cart detail
       const cartDetail = await CartDetail.create({
         cart: cart?._id,
@@ -100,10 +121,10 @@ export const save = async (req, res) => {
         });
         cartDetail?.options?.push(cartDetailOption?._id);
       }
-      cartDetail.save();
+      await cartDetail.save();
       cart?.menu?.push(cartDetail?._id);
     }
-    cart.save();
+    await cart.save();
     const populatedCart = await Cart.findById(cart?._id)?.populate({
       path: 'menu',
       select: '-createdAt -updatedAt -cart -_id',
@@ -186,5 +207,37 @@ export const removeAll = async (req, res) => {
     return res.status(200).json(OK(carts));
   } catch (error) {
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
+  }
+};
+
+const validateProduct = async (productInDb, productToValidate) => {
+  for (const optionInProduct of productInDb?.options) {
+    // console.log(optionInProduct);
+    // Verify if the option group exists
+    const productOptionGroupExistsInProduct = productToValidate?.options?.find(
+      (option) => option?.option == optionInProduct?.toString()
+    );
+    if (!productOptionGroupExistsInProduct) {
+      return false;
+    }
+    // Verify if the option selected exists in the option group
+    const optionsInProductOptionGroup = await ProductOptionGroup.findById(
+      optionInProduct?.toString()
+    )?.populate({ path: 'options' });
+    const optionSelectedExists = optionsInProductOptionGroup?.options?.find(
+      (item) =>
+        item?._id?.toString() == productOptionGroupExistsInProduct?.selected
+    );
+    if (!optionSelectedExists) {
+      return false;
+    }
+    // Verify if the option selected is active
+    const optionSelectedIsActive = await Option.findById(
+      optionSelectedExists?.option
+    )?.select('isActive');
+    if (!optionSelectedIsActive?.isActive) {
+      return false;
+    }
+    return true;
   }
 };
