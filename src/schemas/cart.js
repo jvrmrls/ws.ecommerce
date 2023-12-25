@@ -56,4 +56,18 @@ CartSchema.pre(
   }
 );
 
+CartSchema.pre(
+  'deleteMany',
+  { document: false, query: true },
+  async function (next) {
+    for (const cart of this) {
+      for (const product of cart.menu) {
+        const deletedProduct = await CartDetail.findById(product);
+        await deletedProduct.deleteOne();
+      }
+    }
+    next();
+  }
+);
+
 export default model('Cart', CartSchema);

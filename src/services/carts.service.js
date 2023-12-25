@@ -12,6 +12,9 @@ import { validationResult } from 'express-validator';
 
 export const find = async (req, res) => {
   try {
+    //* Delete all carts with empty menu of this user
+    await Cart.deleteMany({ menu: [], uid: req?.uid });
+    //* Get all carts of this user
     const carts = await Cart.find({
       uid: req?.uid,
       company: COMPANY_ID
