@@ -50,7 +50,9 @@ export const getData = async (req, res) => {
     })
       .sort({ name: 1 })
       .select('name cartName group');
-    const offers = await Offer.find({ company: COMPANY_ID, isActive: true });
+    const offers = await Offer.find({ company: COMPANY_ID, isActive: true })
+      .sort({ from: 1 })
+      .select('-company -isActive -createdAt -updatedAt -__v');
     return res
       .status(200)
       .json(
