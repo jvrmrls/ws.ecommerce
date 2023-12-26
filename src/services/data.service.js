@@ -5,6 +5,7 @@ import Company from '#src/schemas/company';
 import Carousel from '#src/schemas/carousel';
 import Message from '#src/schemas/message';
 import Option from '#src/schemas/option';
+import Offer from '#src/schemas/offer';
 import { COMPANY_ID } from '#src/config/index';
 import admin from 'firebase-admin';
 
@@ -49,9 +50,12 @@ export const getData = async (req, res) => {
     })
       .sort({ name: 1 })
       .select('name cartName group');
+    const offers = await Offer.find({ company: COMPANY_ID, isActive: true });
     return res
       .status(200)
-      .json(OK({ menu, categories, options, carousels, messages, company }));
+      .json(
+        OK({ menu, categories, options, carousels, messages, offers, company })
+      );
   } catch (error) {
     console.log(error);
     return res.status(500).json(INTERNAL_SERVER_ERROR(error.message));
