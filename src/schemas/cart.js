@@ -48,10 +48,13 @@ CartSchema.pre(
   'deleteOne',
   { document: true, query: false },
   async function (next) {
-    for (const product of this.menu) {
+    const deletePromises = this.menu.map(async (product) => {
       const deletedProduct = await CartDetail.findById(product);
-      await deletedProduct.deleteOne();
-    }
+      if (deletedProduct) {
+        return deletedProduct.deleteOne();
+      }
+    });
+    await Promise.all(deletePromises);
     next();
   }
 );
@@ -60,12 +63,16 @@ CartSchema.pre(
   'deleteMany',
   { document: false, query: true },
   async function (next) {
-    for (const cart of this) {
-      for (const product of cart.menu) {
+    const carts = await this.model.find(this.getFilter());
+    const deletePromises = carts.flatMap((cart) =>
+      cart.menu.map(async (product) => {
         const deletedProduct = await CartDetail.findById(product);
-        await deletedProduct.deleteOne();
-      }
-    }
+        if (deletedProduct) {
+          return deletedProduct.deleteOne();
+        }
+      })
+    );
+    await Promise.all(deletePromises);
     next();
   }
 );
