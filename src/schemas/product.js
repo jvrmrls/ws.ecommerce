@@ -69,12 +69,13 @@ ProductSchema.pre(
   'deleteOne',
   { document: true, query: false },
   async function (next) {
-    for (const option of this.options) {
-      const deletedProductOptionGroup = await ProductOptionGroup.findById(
-        option
-      );
-      await deletedProductOptionGroup.deleteOne();
-    }
+    await ProductOptionGroup.deleteMany({ _id: { $in: this.options } });
+    // for (const option of this.options) {
+    //   const deletedProductOptionGroup = await ProductOptionGroup.findById(
+    //     option
+    //   );
+    //   await deletedProductOptionGroup.deleteOne();
+    // }
     next();
   }
 );

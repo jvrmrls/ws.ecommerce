@@ -26,15 +26,19 @@ ProductOptionGroupSchema.pre(
   { document: true, query: false },
   async function (next) {
     const existingInProducts = await Product.find({
-      'options': { $in: [this._id] }
-    })
+      options: { $in: [this._id] }
+    });
     if (existingInProducts.length > 0) {
-      throw new Error('No se puede eliminar el grupo de opciones porque está siendo usado por un producto');
+      throw new Error(
+        'No se puede eliminar el grupo de opciones porque está siendo usado por un producto'
+      );
     }
-    for (const option of this.options) {
-      const deletedProductOption = ProductOption.findById(option);
-      await deletedProductOption.deleteOne();
-    }
+    await ProductOption.deleteMany({ option: { $in: this.options } });
+
+    // for (const option of this.options) {
+    //   const deletedProductOption = ProductOption.findById(option);
+    //   await deletedProductOption.deleteOne();
+    // }
     next();
   }
 );

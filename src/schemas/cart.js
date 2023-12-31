@@ -48,13 +48,7 @@ CartSchema.pre(
   'deleteOne',
   { document: true, query: false },
   async function (next) {
-    const deletePromises = this.menu.map(async (product) => {
-      const deletedProduct = await CartDetail.findById(product);
-      if (deletedProduct) {
-        return deletedProduct.deleteOne();
-      }
-    });
-    await Promise.all(deletePromises);
+    await CartDetail.deleteMany({ cart: this._id });
     next();
   }
 );
@@ -63,16 +57,7 @@ CartSchema.pre(
   'deleteMany',
   { document: false, query: true },
   async function (next) {
-    const carts = await this.model.find(this.getFilter());
-    const deletePromises = carts.flatMap((cart) =>
-      cart.menu.map(async (product) => {
-        const deletedProduct = await CartDetail.findById(product);
-        if (deletedProduct) {
-          return deletedProduct.deleteOne();
-        }
-      })
-    );
-    await Promise.all(deletePromises);
+    await CartDetail.deleteMany({ cart: { $in: this.getFilter()._id } });
     next();
   }
 );

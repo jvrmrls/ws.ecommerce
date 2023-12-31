@@ -31,18 +31,11 @@ const CartDetailSchema = new Schema(
     versionKey: false
   }
 );
-
 CartDetailSchema.pre(
   'deleteOne',
   { document: true, query: false },
   async function (next) {
-    const deletePromises = this.options.map(async (option) => {
-      const deletedCartDetailOption = await CartDetailOption.findById(option);
-      if (deletedCartDetailOption) {
-        return deletedCartDetailOption.deleteOne();
-      }
-    });
-    await Promise.all(deletePromises);
+    await CartDetailOption.deleteMany({ cartDetail: this._id });
     next();
   }
 );
@@ -52,13 +45,7 @@ CartDetailSchema.pre(
   { document: false, query: true },
   async function (next) {
     const cartDetails = await this.model.find(this.getFilter());
-    for (const cartDetail of cartDetails) {
-      const deletePromises = cartDetail.options.map(async (option) => {
-        const deletedCartDetailOption = await CartDetailOption.findById(option);
-        if (deletedCartDetailOption) await deletedCartDetailOption.deleteOne();
-      });
-      await Promise.all(deletePromises);
-    }
+    await CartDetailOption.deleteMany({ cartDetail: { $in: cartDetails } });
     next();
   }
 );
