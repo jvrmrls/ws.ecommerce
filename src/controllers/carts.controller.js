@@ -22,6 +22,7 @@ router.get('/code/:code', authentication, findByCode);
 router.post(
   '/',
   body('menu').isArray({ min: 0 }).withMessage('El menú debe ser una lista'),
+  body('name').notEmpty().withMessage('El nombre es requerido'),
   authentication,
   save
 );

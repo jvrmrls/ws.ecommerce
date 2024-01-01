@@ -63,7 +63,7 @@ export const save = async (req, res) => {
     //   user: req.user._id,
     //   company: COMPANY_ID
     // });
-    const { _id, status, visibility, menu } = req.body;
+    const { _id, status, visibility, menu, name } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json(BAD_REQUEST(errors.array()));
@@ -77,6 +77,7 @@ export const save = async (req, res) => {
     if (!cart) {
       // Save an empty cart
       cart = await Cart.create({
+        name,
         code: uuidv4(),
         status,
         visibility,

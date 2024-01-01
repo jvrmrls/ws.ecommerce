@@ -4,6 +4,10 @@ import CartDetail from '#src/schemas/cartDetail';
 
 const CartSchema = new Schema(
   {
+    name: {
+      type: String,
+      default: 'Carrito de compras'
+    },
     code: {
       type: String,
       required: true
