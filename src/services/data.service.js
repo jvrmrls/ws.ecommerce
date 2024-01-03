@@ -6,6 +6,7 @@ import Carousel from '#src/schemas/carousel';
 import Message from '#src/schemas/message';
 import Option from '#src/schemas/option';
 import Offer from '#src/schemas/offer';
+import Shop from '#src/schemas/shop';
 import { COMPANY_ID } from '#src/config/index';
 import admin from 'firebase-admin';
 
@@ -53,10 +54,22 @@ export const getData = async (req, res) => {
     const offers = await Offer.find({ company: COMPANY_ID, isActive: true })
       .sort({ from: 1 })
       .select('-company -isActive -createdAt -updatedAt -__v');
+    const shops = await Shop.find({ company: COMPANY_ID, isActive: true })
+      .sort({ name: 1 })
+      .select('-company -isActive -createdAt -updatedAt -__v');
     return res
       .status(200)
       .json(
-        OK({ menu, categories, options, carousels, messages, offers, company })
+        OK({
+          menu,
+          categories,
+          options,
+          carousels,
+          messages,
+          offers,
+          shops,
+          company
+        })
       );
   } catch (error) {
     console.log(error);
